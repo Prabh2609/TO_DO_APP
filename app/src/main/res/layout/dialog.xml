@@ -4,46 +4,67 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
-    <LinearLayout
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        app:navigationIcon="@drawable/ic_close" />
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:orientation="vertical"
+        app:layout_anchor="@id/toolbar"
+        app:layout_anchorGravity="bottom|center_horizontal"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-        <com.google.android.material.appbar.MaterialToolbar
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:paddingLeft="6dp"
-            android:paddingRight="16dp"
-            android:id="@+id/toolbar"
-            app:contentInsetStartWithNavigation="0dp"
-            app:navigationIcon="@drawable/ic_close"/>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_height="60dp"
+            android:hint="New Task">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
-                android:minHeight="60dp"
-                android:hint="Enter Task"
-                android:layout_gravity="center_horizontal" />
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="save"
-                android:backgroundTint="@color/colorAccent"
-                android:layout_gravity="end|bottom"
-                android:layout_margin="16dp"
-                android:id="@+id/save"/>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_height="60dp"
+            android:hint="Due By">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/due"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:focusable="false" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        </FrameLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:hint="Notify on">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/notify"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:focusable="false" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/save"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorAccent"
+            android:text="save" />/
 
     </LinearLayout>
 
-
-    
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
