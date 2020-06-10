@@ -15,8 +15,8 @@ import java.util.List;
 
 public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskViewHolder> {
 
-    private LayoutInflater inflater;
     private List<Task> taskList;
+    final LayoutInflater inflater;
 
     TaskListAdapter(Context context) {
         inflater = LayoutInflater.from(context);
@@ -25,39 +25,39 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
     @NonNull
     @Override
     public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = inflater.inflate(R.layout.recycler_item, parent, false);
-        return new TaskViewHolder(itemView);
+        View view = inflater.inflate(R.layout.recycler_item, parent, false);
+        return new TaskViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         if (taskList != null) {
-            Task current = taskList.get(position);
-            holder.textView.setText(current.getTitle());
+            Task task = taskList.get(position);
+            holder.listItemView.setText(task.getTitle());
         } else {
-            holder.textView.setText("All Good!!");
+            holder.listItemView.setText("Nothing :(");
         }
-    }
-
-    void setTaskList(List<Task> tasks) {
-        taskList = tasks;
-        notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
         if (taskList != null) {
             return taskList.size();
-        } else return 0;
-    }
-
-    public class TaskViewHolder extends RecyclerView.ViewHolder {
-        private final TextView textView;
-
-        public TaskViewHolder(@NonNull View itemView) {
-            super(itemView);
-            textView = itemView.findViewById(R.id.text_view);
+        } else {
+            return 0;
         }
     }
 
+    public void setTaskList(List<Task> tasks) {
+        taskList = tasks;
+        notifyDataSetChanged();
+    }
+
+    public class TaskViewHolder extends RecyclerView.ViewHolder {
+        final TextView listItemView;
+        public TaskViewHolder(@NonNull View itemView) {
+            super(itemView);
+            listItemView = itemView.findViewById(R.id.text_view);
+        }
+    }
 }

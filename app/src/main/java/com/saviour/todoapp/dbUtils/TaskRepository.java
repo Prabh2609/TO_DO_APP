@@ -8,16 +8,16 @@ import java.util.List;
 
 public class TaskRepository {
     private TaskDao taskDao;
-    private LiveData<List<Task>> mAllTasks;
+    private LiveData<List<Task>> allTasks;
 
     TaskRepository(Application application) {
-        TaskRoomDatabase db = TaskRoomDatabase.getDatabase(application);
-        taskDao = db.taskDao();
-        mAllTasks = taskDao.getAll();
+        TaskRoomDatabase database = TaskRoomDatabase.getInstance(application);
+        taskDao = database.taskDao();
+        allTasks = taskDao.getAll();
     }
 
     LiveData<List<Task>> getAllTasks() {
-        return mAllTasks;
+        return allTasks;
     }
 
     void insert(Task task) {

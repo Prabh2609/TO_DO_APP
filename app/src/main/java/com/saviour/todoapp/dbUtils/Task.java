@@ -11,7 +11,7 @@ public class Task {
     @NonNull
     private int tid;
     @ColumnInfo(name = "title")
-    private String mTitle;
+    private String title;
 
     public int getTid() {
         return tid;
@@ -22,10 +22,10 @@ public class Task {
     }
 
     public String getTitle() {
-        return mTitle;
+        return title;
     }
 
-    public void setTitle(String mTitle) {
-        this.mTitle = mTitle;
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

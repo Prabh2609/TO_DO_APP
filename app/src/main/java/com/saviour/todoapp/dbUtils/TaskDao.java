@@ -12,7 +12,6 @@ import java.util.List;
 public interface TaskDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insert(Task task);
-
     @Query("SELECT * FROM task_table ORDER BY tid ASC")
     LiveData<List<Task>> getAll();
 }
