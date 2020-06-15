@@ -2,6 +2,7 @@ package com.saviour.todoapp.dbUtils;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -12,6 +13,13 @@ import java.util.List;
 public interface TaskDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insert(Task task);
-    @Query("SELECT * FROM task_table ORDER BY tid ASC")
+
+    @Query("SELECT * FROM task_table WHERE dueBy>current_timestamp ORDER BY dueBy ASC")
     LiveData<List<Task>> getAll();
+
+    @Query("SELECT * FROM task_table WHERE current_timestamp>dueBy ORDER BY dueBy ASC")
+    LiveData<List<Task>> getDueTasks();
+
+    @Delete
+    void deleteTask(Task task);
 }

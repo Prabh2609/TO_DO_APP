@@ -34,6 +34,8 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
         if (taskList != null) {
             Task task = taskList.get(position);
             holder.listItemView.setText(task.getTitle());
+            holder.dueBY.setText("Due By : " + task.getDueBy());
+            holder.notifyOn.setText("Notify On : " + task.getNotifyOn());
         } else {
             holder.listItemView.setText("Nothing :(");
         }
@@ -53,11 +55,18 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskVi
         notifyDataSetChanged();
     }
 
+    public Task getTaskPosition(int position) {
+        return taskList.get(position);
+    }
+
     public class TaskViewHolder extends RecyclerView.ViewHolder {
-        final TextView listItemView;
+        final TextView listItemView, dueBY, notifyOn;
+
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
             listItemView = itemView.findViewById(R.id.text_view);
+            dueBY = itemView.findViewById(R.id.due_text_view);
+            notifyOn = itemView.findViewById(R.id.notify_text_view);
         }
     }
 }

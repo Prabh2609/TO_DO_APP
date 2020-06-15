@@ -12,6 +12,10 @@ public class Task {
     private int tid;
     @ColumnInfo(name = "title")
     private String title;
+    @ColumnInfo(name = "dueBy")
+    private String dueBy;
+    @ColumnInfo(name = "notifyOn")
+    private String notifyOn;
 
     public int getTid() {
         return tid;
@@ -27,5 +31,21 @@ public class Task {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getDueBy() {
+        return dueBy;
+    }
+
+    public void setDueBy(String dueBy) {
+        this.dueBy = dueBy;
+    }
+
+    public String getNotifyOn() {
+        return notifyOn;
+    }
+
+    public void setNotifyOn(String notifyOn) {
+        this.notifyOn = notifyOn;
     }
 }
