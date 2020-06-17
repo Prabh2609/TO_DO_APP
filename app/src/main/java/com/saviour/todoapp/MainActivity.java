@@ -1,8 +1,15 @@
 package com.saviour.todoapp;
 
+import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,17 +29,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.saviour.todoapp.dbUtils.Task;
 import com.saviour.todoapp.dbUtils.TaskViewModel;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int NOTIFICATION_ID = 0;
     private TextView dayTextView;
+    private String PRIMARY_CHANEL_ID = "primary_notification_channel";
+    private NotificationManager mNotificationManager;
     private SimpleDateFormat currentDay;
     private FloatingActionButton btnAddNewTask;
     private Context context;
@@ -41,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private TaskViewModel viewModel;
     private ItemTouchHelper itemTouchHelper;
+    private TaskListAdapter adapter;
+    private Calendar myCalendar;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,9 +64,11 @@ public class MainActivity extends AppCompatActivity {
         currentDay = new SimpleDateFormat("EEEE , dd/MMMM/yyyy");
         recyclerView = findViewById(R.id.recycler_view);
         viewModel = new ViewModelProvider((ViewModelStoreOwner) context).get(TaskViewModel.class);
-        View contextView = findViewById(R.id.item_card);
 
-        final TaskListAdapter adapter = new TaskListAdapter(context);
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        myCalendar = Calendar.getInstance();
+
+        adapter = new TaskListAdapter(context);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         gestureObject = new GestureDetectorCompat(context, new GestureDetector.SimpleOnGestureListener() {
@@ -63,6 +77,9 @@ public class MainActivity extends AppCompatActivity {
                 if (e1.getX() > e2.getX() && Math.abs(e1.getX() - e2.getX()) > 100) {
                     Intent intent = new Intent(context, DueTasks.class);
                     startActivity(intent);
+                } else if (e1.getY() > e2.getY() && Math.abs(e1.getY() - getScreenHeight()) < 100) {
+                    Intent intent = new Intent(context, Add_New_Task.class);
+                    startActivityForResult(intent, ADD_NEW_TASK_REQ_CODE);
                 }
                 return super.onFling(e1, e2, velocityX, velocityY);
             }
@@ -78,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
                 Task task = adapter.getTaskPosition(position);
-                Snackbar.make(contextView, "Deleting " + task.getTitle(), Snackbar.LENGTH_SHORT).show();
+                Toast.makeText(context, "Deleting " + task.getTitle(), Toast.LENGTH_SHORT).show();
 
                 viewModel.deleteTask(task);
             }
@@ -101,6 +118,23 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, ADD_NEW_TASK_REQ_CODE);
             }
         });
+
+        createNotificationChannel();
+    }
+
+    public void createNotificationChannel() {
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(PRIMARY_CHANEL_ID, "Alarm Notification", NotificationManager.IMPORTANCE_HIGH);
+
+            notificationChannel.enableVibration(true);
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.RED);
+            notificationChannel.setDescription("Alarm for every to do task");
+
+            mNotificationManager.createNotificationChannel(notificationChannel);
+        }
     }
 
     @Override
@@ -111,9 +145,37 @@ public class MainActivity extends AppCompatActivity {
             task.setTitle(data.getStringExtra("title"));
             task.setDueBy(data.getStringExtra("due_by"));
             task.setNotifyOn(data.getStringExtra("notify_on"));
+
+            Intent notifyIntent = new Intent(context, AlarmReceiver.class);
+            PendingIntent notifyPendingIntent = PendingIntent.getBroadcast(context, task.getTid(), notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            setAlarm(notifyPendingIntent, data.getStringExtra("notify_on"));
+
             viewModel.insert(task);
+
         } else
             Toast.makeText(context, "CANCELLED BY USER", Toast.LENGTH_LONG).show();
+    }
+
+    private void setAlarm(PendingIntent notifyPendingIntent, String notify_on) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        String DateTime = notify_on;
+        String Date = DateTime.split(" ")[0];
+        String Time = DateTime.split(" ")[1];
+
+        myCalendar.setTimeInMillis(System.currentTimeMillis());
+        myCalendar.set(Calendar.YEAR, Integer.parseInt(Date.split("/")[2]));
+        myCalendar.set(Calendar.MONTH, Integer.parseInt(Date.split("/")[1]) - 1);
+        myCalendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(Date.split("/")[0]));
+        myCalendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(Time.split(":")[0]));
+        myCalendar.set(Calendar.MINUTE, Integer.parseInt(Time.split(":")[1]));
+
+        if (alarmManager != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, myCalendar.getTimeInMillis(), notifyPendingIntent);
+            }
+        }
     }
 
     @Override
@@ -126,5 +188,12 @@ public class MainActivity extends AppCompatActivity {
     public boolean dispatchTouchEvent(MotionEvent ev) {
         super.dispatchTouchEvent(ev);
         return gestureObject.onTouchEvent(ev);
+    }
+
+    private int getScreenHeight() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+        return displayMetrics.heightPixels;
     }
 }

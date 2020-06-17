@@ -11,6 +11,7 @@ public class TaskRepository {
     private TaskDao taskDao;
     private LiveData<List<Task>> allTasks;
     private LiveData<List<Task>> dueTasks;
+    private List<Task> tasksSortedWithNotification;
 
     TaskRepository(Application application) {
         TaskRoomDatabase database = TaskRoomDatabase.getInstance(application);

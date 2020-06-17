@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,7 +18,6 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.saviour.todoapp.dbUtils.Task;
 import com.saviour.todoapp.dbUtils.TaskViewModel;
 
@@ -70,7 +70,7 @@ public class DueTasks extends AppCompatActivity {
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
                 Task task = adapter.getTaskPosition(position);
-                Snackbar.make(contextView, "Deleting " + task.getTitle(), Snackbar.LENGTH_SHORT).show();
+                Toast.makeText(context, "Deleting : " + task.getTitle(), Toast.LENGTH_SHORT).show();
 
                 viewModel.deleteTask(task);
             }
